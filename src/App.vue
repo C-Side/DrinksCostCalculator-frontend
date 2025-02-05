@@ -7,7 +7,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import CreatePerson from './components/CreatePerson.vue'
 import AddDrink from './components/AddDrink.vue'
 import TotalCost from './components/TotalCost.vue'
