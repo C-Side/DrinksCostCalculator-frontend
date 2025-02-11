@@ -6,20 +6,24 @@
         <input
           v-model.trim="personId"
           placeholder="Person ID"
-          :class="{ 'error': errors.personId }"
+          :class="{ error: errors.personId }"
           @input="clearError('personId')"
         />
         <span v-if="errors.personId" class="error-message">{{ errors.personId }}</span>
       </div>
 
-      <div class="form-group">
-        <input
-          v-model.trim="drinkId"
-          placeholder="Drink ID"
-          :class="{ 'error': errors.drinkId }"
-          @input="clearError('drinkId')"
-        />
-        <span v-if="errors.drinkId" class="error-message">{{ errors.drinkId }}</span>
+      <div class="relative">
+        <select
+          v-model="selectedDrink"
+          @change="handleChange"
+          class="w-full p-2 border rounded"
+          :disabled="isLoading"
+        >
+          <option value="" disabled>Select a drink</option>
+          <option v-for="drink in drinks" :key="drink.id" :value="drink">
+            {{ drink.name }}
+          </option>
+        </select>
       </div>
 
       <div class="form-group">
@@ -29,25 +33,18 @@
           step="1"
           min="1"
           placeholder="Amount of Drink"
-          :class="{ 'error': errors.quantity }"
+          :class="{ error: errors.quantity }"
           @input="clearError('quantity')"
         />
         <span v-if="errors.quantity" class="error-message">{{ errors.quantity }}</span>
       </div>
 
-      <button
-        type="submit"
-        :disabled="isLoading || !isFormValid"
-      >
+      <button type="submit" :disabled="isLoading || !isFormValid">
         {{ isLoading ? 'Adding...' : 'Add Drink' }}
       </button>
     </form>
 
-    <div
-      v-if="successMessage"
-      class="success-message"
-      role="alert"
-    >
+    <div v-if="successMessage" class="success-message" role="alert">
       {{ successMessage }}
     </div>
   </div>
@@ -55,18 +52,21 @@
 
 <script lang="ts">
 import apiClient from '../api/axiosConfig'
+import type { Drink } from '@/types/Drink.ts'
 
 export default {
   name: 'AddDrink',
   data() {
     return {
-      personId: '',
-      drinkId: '',
-      quantity: '',
+      personId: '' as string,
+      drinks: [] as Drink[],
+      selectedDrink: {} as Drink,
+      quantity: 0 as number,
+      searchQuery: '',
+      isOpen: false,
       isLoading: false,
       errors: {
         personId: '',
-        drinkId: '',
         quantity: ''
       },
       successMessage: '',
@@ -75,10 +75,13 @@ export default {
   computed: {
     isFormValid() {
       return this.personId.trim() &&
-        this.drinkId.trim() &&
-        this.quantity !== '' &&
         this.quantity >= 1 &&
         !Object.values(this.errors).some(error => error)
+    },
+    filteredDrinks() {
+      return this.drinks.filter((drink: Drink) =>
+        drink.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+      )
     }
   },
   methods: {
@@ -86,7 +89,6 @@ export default {
       let isValid = true
       this.errors = {
         personId: '',
-        drinkId: '',
         quantity: ''
       }
 
@@ -95,12 +97,7 @@ export default {
         isValid = false
       }
 
-      if (!this.drinkId.trim()) {
-        this.errors.drinkId = 'Drink ID is required'
-        isValid = false
-      }
-
-      if (this.quantity === '') {
+      if (this.quantity === null) {
         this.errors.quantity = 'quantity is required'
         isValid = false
       } else if (this.quantity < 1) {
@@ -117,12 +114,22 @@ export default {
 
     resetForm() {
       this.personId = ''
-      this.personId = ''
-      this.quantity = ''
+      this.quantity = 1
       this.errors = {
         personId: '',
-        drinkId: '',
         quantity: ''
+      }
+    },
+
+    async fetchDrinks() {
+      this.isLoading = true
+      try {
+        const response = await apiClient.get('/drinks')
+        this.drinks = await response.data
+      } catch (error) {
+        this.handleError(error)
+      } finally {
+        this.isLoading = false
       }
     },
 
@@ -138,8 +145,8 @@ export default {
         const response = await apiClient.post(
           `/persons/${this.personId.trim()}/drinks`,
           {
-            drinkId: this.drinkId.trim(),
-            quantity: parseFloat(this.quantity)
+            drinkDTO: this.selectedDrink,
+            quantity: this.quantity
           }
         )
 
@@ -178,10 +185,17 @@ export default {
       console.error('Add drink error:', error)
     },
 
+    handleChange() {
+      this.$emit('drink-selected', this.selectedDrink)
+    },
+
     showErrorNotification(message) {
       // You could replace this with a more sophisticated notification system
       alert(message)
     }
+  },
+  mounted() {
+    this.fetchDrinks()
   }
 }
 </script>
