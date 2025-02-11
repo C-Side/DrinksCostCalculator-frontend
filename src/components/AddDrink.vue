@@ -14,25 +14,25 @@
 
       <div class="form-group">
         <input
-          v-model.trim="name"
-          placeholder="Drink Name"
-          :class="{ 'error': errors.name }"
-          @input="clearError('name')"
+          v-model.trim="drinkId"
+          placeholder="Drink ID"
+          :class="{ 'error': errors.drinkId }"
+          @input="clearError('drinkId')"
         />
-        <span v-if="errors.name" class="error-message">{{ errors.name }}</span>
+        <span v-if="errors.drinkId" class="error-message">{{ errors.drinkId }}</span>
       </div>
 
       <div class="form-group">
         <input
-          v-model.number="price"
+          v-model.number="quantity"
           type="number"
-          step="0.01"
-          min="0"
-          placeholder="Drink Price"
-          :class="{ 'error': errors.price }"
-          @input="clearError('price')"
+          step="1"
+          min="1"
+          placeholder="Amount of Drink"
+          :class="{ 'error': errors.quantity }"
+          @input="clearError('quantity')"
         />
-        <span v-if="errors.price" class="error-message">{{ errors.price }}</span>
+        <span v-if="errors.quantity" class="error-message">{{ errors.quantity }}</span>
       </div>
 
       <button
@@ -61,13 +61,13 @@ export default {
   data() {
     return {
       personId: '',
-      name: '',
-      price: '',
+      drinkId: '',
+      quantity: '',
       isLoading: false,
       errors: {
         personId: '',
-        name: '',
-        price: ''
+        drinkId: '',
+        quantity: ''
       },
       successMessage: '',
     }
@@ -75,9 +75,9 @@ export default {
   computed: {
     isFormValid() {
       return this.personId.trim() &&
-        this.name.trim() &&
-        this.price !== '' &&
-        this.price >= 0 &&
+        this.drinkId.trim() &&
+        this.quantity !== '' &&
+        this.quantity >= 1 &&
         !Object.values(this.errors).some(error => error)
     }
   },
@@ -86,8 +86,8 @@ export default {
       let isValid = true
       this.errors = {
         personId: '',
-        name: '',
-        price: ''
+        drinkId: '',
+        quantity: ''
       }
 
       if (!this.personId.trim()) {
@@ -95,16 +95,16 @@ export default {
         isValid = false
       }
 
-      if (!this.name.trim()) {
-        this.errors.name = 'Drink name is required'
+      if (!this.drinkId.trim()) {
+        this.errors.drinkId = 'Drink ID is required'
         isValid = false
       }
 
-      if (this.price === '') {
-        this.errors.price = 'Price is required'
+      if (this.quantity === '') {
+        this.errors.quantity = 'quantity is required'
         isValid = false
-      } else if (this.price < 0) {
-        this.errors.price = 'Price cannot be negative'
+      } else if (this.quantity < 1) {
+        this.errors.quantity = 'quantity cannot be negative or zero'
         isValid = false
       }
 
@@ -117,12 +117,12 @@ export default {
 
     resetForm() {
       this.personId = ''
-      this.name = ''
-      this.price = ''
+      this.personId = ''
+      this.quantity = ''
       this.errors = {
         personId: '',
-        name: '',
-        price: ''
+        drinkId: '',
+        quantity: ''
       }
     },
 
@@ -138,8 +138,8 @@ export default {
         const response = await apiClient.post(
           `/persons/${this.personId.trim()}/drinks`,
           {
-            name: this.name.trim(),
-            price: parseFloat(this.price)
+            drinkId: this.drinkId.trim(),
+            quantity: parseFloat(this.quantity)
           }
         )
 
