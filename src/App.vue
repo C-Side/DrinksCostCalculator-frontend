@@ -1,32 +1,40 @@
 <template>
-  <div id="app">
-    <h1>Drink Cost Calculator</h1>
-    <CreatePerson />
-    <CreateDrink />
-    <AddDrink />
-    <TotalCost />
+  <div class="min-h-screen bg-gray-50">
+    <nav class="bg-white shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex">
+            <RouterLink
+              to="/"
+              class="flex items-center px-4 py-2 text-gray-700 hover:text-gray-900"
+            >
+              Home
+            </RouterLink>
+            <RouterLink
+              to="/drinks"
+              class="flex items-center px-4 py-2 text-gray-700 hover:text-gray-900"
+            >
+              Drinks
+            </RouterLink>
+            <RouterLink
+              to="/persons"
+              class="flex items-center px-4 py-2 text-gray-700 hover:text-gray-900"
+            >
+              Persons
+            </RouterLink>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <RouterView></RouterView>
+    </main>
   </div>
 </template>
 
 <script lang="ts">
-import CreatePerson from './components/CreatePerson.vue'
-import CreateDrink from '@/components/CreateDrink.vue'
-import AddDrink from './components/AddDrink.vue'
-import TotalCost from './components/TotalCost.vue'
-
 export default {
-  components: {
-    CreatePerson,
-    CreateDrink,
-    AddDrink,
-    TotalCost,
-  },
+  name: 'App'
 }
 </script>
-
-<style>
-#app {
-  font-family: Arial, sans-serif;
-  margin: 20px;
-}
-</style>

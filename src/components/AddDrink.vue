@@ -125,7 +125,7 @@ export default {
       this.isLoading = true
       try {
         const response = await apiClient.get('/drinks')
-        this.drinks = await response.data
+        this.drinks = response.data
       } catch (error) {
         this.handleError(error)
       } finally {
