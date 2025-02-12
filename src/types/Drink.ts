@@ -1,5 +1,5 @@
 export interface Drink {
-  id: number | null;
+  id: number;
   name: string;
   price: number;
 }
