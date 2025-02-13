@@ -47,6 +47,7 @@
 
 <script lang="ts">
 import apiClient from '../api/axiosConfig'
+import axios, { type AxiosError } from 'axios'
 
 export default {
   name: 'TotalCost',
@@ -57,7 +58,7 @@ export default {
       errorMessage: '',
       showError: false,
       isLoading: false,
-      lastUpdated: null,
+      lastUpdated: new Date(),
     }
   },
   methods: {
@@ -66,14 +67,14 @@ export default {
       this.errorMessage = ''
     },
 
-    formatCurrency(amount) {
+    formatCurrency(amount: number) {
       return new Intl.NumberFormat('de-DE', {
         style: 'currency',
         currency: 'EUR'
       }).format(amount)
     },
 
-    formatDateTime(date) {
+    formatDateTime(date: Date) {
       return new Intl.DateTimeFormat('de-DE', {
         dateStyle: 'medium',
         timeStyle: 'short'
@@ -115,13 +116,17 @@ export default {
           totalCost: this.totalCost
         })
       } catch (error) {
-        this.handleError(error)
+        if (axios.isAxiosError(error)) {
+          this.handleError(error);
+        } else {
+          console.error('Unexpected error:', error);
+        }
       } finally {
         this.isLoading = false
       }
     },
 
-    handleError(error) {
+    handleError(error: AxiosError) {
       this.showError = true
       this.totalCost = null
 
