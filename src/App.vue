@@ -23,7 +23,6 @@
               Persons
             </RouterLink>
           </div>
-          <TotalCost />
         </div>
       </div>
     </nav>
@@ -35,10 +34,8 @@
 </template>
 
 <script lang="ts">
-import TotalCost from '@/components/TotalCost.vue'
 
 export default {
-  name: 'App',
-  components: { TotalCost }
+  name: 'App'
 }
 </script>

@@ -15,5 +15,11 @@
         Manage Persons
       </router-link>
     </div>
+    <div class="flex gap-4">
+      <TotalCost />
+    </div>
   </div>
 </template>
+<script setup lang="ts">
+import TotalCost from '@/components/TotalCost.vue'
+</script>
