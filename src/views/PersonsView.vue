@@ -77,8 +77,8 @@ export default {
     async handleSubmit() {
       try {
         const url = this.editingPersonId
-          ? `http://localhost:8080/api/persons/${this.editingPersonId}`
-          : 'http://localhost:8080/api/persons'
+          ? apiClient.getUri({ url: `/persons/${this.editingPersonId}` })
+          : apiClient.getUri({ url: '/persons' })
 
         const method = this.editingPersonId ? 'PUT' : 'POST'
 
