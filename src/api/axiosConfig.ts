@@ -7,9 +7,4 @@ const apiClient = axios.create({
   }
 })
 
-// Optional: Log the base URL in development
-if (import.meta.env.DEV) {
-  console.log('🚀 API Base URL:', import.meta.env.VITE_API_BASE_URL)
-}
-
 export default apiClient

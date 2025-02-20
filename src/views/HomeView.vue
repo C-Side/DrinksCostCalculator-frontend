@@ -6,20 +6,23 @@
         to="/drinks"
         class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
       >
-        Manage Drinks
+        Drinks
       </router-link>
       <router-link
         to="/persons"
         class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
       >
-        Manage Persons
+        Persons
       </router-link>
     </div>
     <div class="flex gap-4">
-      <TotalCost />
+      <add-consumption />
+      <total-cost />
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import TotalCost from '@/components/TotalCost.vue'
+import AddConsumption from '@/components/AddConsumption.vue'
 </script>

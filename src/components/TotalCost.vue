@@ -1,265 +1,115 @@
 <template>
-  <div class="total-cost">
-    <h2>Total Cost</h2>
-    <form @submit.prevent="getTotalCost" class="form">
-      <div class="form-group">
-        <label for="personId">Person ID</label>
+  <div class="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-md">
+    <h2 class="text-xl font-semibold text-gray-800 text-center mb-4">Total Cost</h2>
+
+    <form @submit.prevent="getTotalCost" class="space-y-4">
+      <div>
+        <label for="personId" class="block text-sm font-medium text-gray-700">Person ID</label>
         <input
           id="personId"
           v-model.trim="personId"
           placeholder="Enter Person ID"
-          :class="{ 'error': showError }"
+          :class="{ 'border-red-500': showError }"
           @input="clearError"
+          class="mt-1 p-2 w-full border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
         />
-        <span v-if="showError" class="error-message" role="alert">
-          {{ errorMessage }}
-        </span>
+        <p v-if="showError" class="text-red-500 text-sm mt-1">{{ errorMessage }}</p>
       </div>
 
       <button
         type="submit"
-        :disabled="isLoading || !personId.trim()"
+        :disabled="isLoading || !personId"
+        class="w-full py-2 px-4 rounded-lg font-semibold text-white transition disabled:bg-gray-400
+               bg-green-500 hover:bg-green-600 focus:ring-2 focus:ring-green-400"
       >
         <span v-if="isLoading">Loading...</span>
         <span v-else>Get Total</span>
       </button>
     </form>
 
-    <div
-      v-if="totalCost !== null && !errorMessage"
-      class="result"
-      role="status"
-    >
-      <h3>Total Cost</h3>
-      <div class="cost-display">
+    <div v-if="totalCost !== null && !errorMessage" class="mt-6 text-center">
+      <h3 class="text-lg font-semibold text-gray-700">Total Cost</h3>
+      <div class="mt-2 text-2xl font-bold bg-gray-100 p-3 rounded-lg">
         {{ formatCurrency(totalCost) }}
       </div>
     </div>
 
-    <div
-      v-if="lastUpdated"
-      class="last-updated"
-    >
+    <p v-if="lastUpdated" class="mt-4 text-sm text-gray-500 text-center">
       Last updated: {{ formatDateTime(lastUpdated) }}
-    </div>
+    </p>
   </div>
 </template>
 
-<script lang="ts">
-import apiClient from '../api/axiosConfig'
-import axios, { type AxiosError } from 'axios'
+<script setup lang="ts">
+import { ref } from "vue";
+import apiClient from "@/api/axiosConfig";
+import axios, { type AxiosError } from "axios";
+import { formatCurrency, formatDateTime } from "@/util/format.ts";
 
-export default {
-  name: 'TotalCost',
-  data() {
-    return {
-      personId: '',
-      totalCost: null,
-      errorMessage: '',
-      showError: false,
-      isLoading: false,
-      lastUpdated: new Date(),
-    }
-  },
-  methods: {
-    clearError() {
-      this.showError = false
-      this.errorMessage = ''
-    },
+const personId = ref<number | null>(null);
+const totalCost = ref<number | null>(null);
+const errorMessage = ref<string>("");
+const showError = ref<boolean>(false);
+const isLoading = ref<boolean>(false);
+const lastUpdated = ref<Date>();
 
-    formatCurrency(amount: number) {
-      return new Intl.NumberFormat('de-DE', {
-        style: 'currency',
-        currency: 'EUR'
-      }).format(amount)
-    },
+const clearError = () => {
+  showError.value = false;
+  errorMessage.value = "";
+};
 
-    formatDateTime(date: Date) {
-      return new Intl.DateTimeFormat('de-DE', {
-        dateStyle: 'medium',
-        timeStyle: 'short'
-      }).format(new Date(date))
-    },
-
-    validateInput() {
-      if (!this.personId.trim()) {
-        this.showError = true
-        this.errorMessage = 'Please enter a valid Person ID'
-        return false
-      }
-      return true
-    },
-
-    async getTotalCost() {
-      if (!this.validateInput()) {
-        return
-      }
-
-      this.isLoading = true
-      this.totalCost = null
-      this.clearError()
-
-      try {
-        const response = await apiClient.get(
-          `/persons/${this.personId.trim()}/total`,
-          {
-            timeout: 5000 // 5 second timeout
-          }
-        )
-
-        this.totalCost = response.data
-        this.lastUpdated = new Date()
-
-        // Emit the result for parent components
-        this.$emit('cost-retrieved', {
-          personId: this.personId,
-          totalCost: this.totalCost
-        })
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          this.handleError(error);
-        } else {
-          console.error('Unexpected error:', error);
-        }
-      } finally {
-        this.isLoading = false
-      }
-    },
-
-    handleError(error: AxiosError) {
-      this.showError = true
-      this.totalCost = null
-
-      if (error.response) {
-        switch (error.response.status) {
-          case 404:
-            this.errorMessage = 'Person not found'
-            break
-          case 400:
-            this.errorMessage = 'Invalid Person ID'
-            break
-          default:
-            this.errorMessage = 'Error fetching total cost'
-        }
-      } else if (error.code === 'ECONNABORTED') {
-        this.errorMessage = 'Request timed out. Please try again.'
-      } else if (error.request) {
-        this.errorMessage = 'Network error. Please check your connection.'
-      } else {
-        this.errorMessage = 'An unexpected error occurred.'
-      }
-
-      console.error('Total cost fetch error:', error)
-    }
+const validateInput = () => {
+  if (!personId.value) {
+    showError.value = true;
+    errorMessage.value = "Please enter a valid Person ID";
+    return false;
   }
-}
+  return true;
+};
+
+const getTotalCost = async () => {
+  if (!validateInput()) return;
+
+  isLoading.value = true;
+  totalCost.value = null;
+  clearError();
+
+  try {
+    const response = await apiClient.get(`/persons/${personId.value}/total`, { timeout: 5000 });
+    totalCost.value = response.data;
+    lastUpdated.value = new Date();
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      handleError(error);
+    } else {
+      console.error('Unexpected error:', error);
+    }
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const handleError = (error: AxiosError) => {
+  showError.value = true;
+  totalCost.value = null;
+
+  if (error.response) {
+    switch (error.response.status) {
+      case 404:
+        errorMessage.value = "Person not found";
+        break;
+      case 400:
+        errorMessage.value = "Invalid Person ID";
+        break;
+      default:
+        errorMessage.value = "Error fetching total cost";
+    }
+  } else if (error.code === "ECONNABORTED") {
+    errorMessage.value = "Request timed out. Please try again.";
+  } else if (error.request) {
+    errorMessage.value = "Network error. Please check your connection.";
+  } else {
+    errorMessage.value = "An unexpected error occurred.";
+  }
+};
 </script>
-
-<style scoped>
-.total-cost {
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-h2 {
-  color: #2c3e50;
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-label {
-  font-weight: 600;
-  color: #2c3e50;
-}
-
-input {
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
-}
-
-input:focus {
-  outline: none;
-  border-color: #4caf50;
-}
-
-input.error {
-  border-color: #ff4444;
-}
-
-.error-message {
-  color: #ff4444;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-}
-
-button {
-  padding: 0.75rem;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-button:hover:not(:disabled) {
-  background-color: #45a049;
-}
-
-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-
-.result {
-  margin-top: 2rem;
-  text-align: center;
-}
-
-.cost-display {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #2c3e50;
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-  margin-top: 0.5rem;
-}
-
-.last-updated {
-  margin-top: 1rem;
-  font-size: 0.875rem;
-  color: #666;
-  text-align: center;
-}
-
-@media (max-width: 480px) {
-  .total-cost {
-    padding: 1rem;
-    margin: 0.5rem;
-  }
-
-  .cost-display {
-    font-size: 1.5rem;
-  }
-}
-</style>
