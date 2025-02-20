@@ -19,13 +19,13 @@
         required
       />
       <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-        {{ editingDrinkId ? 'Update' : 'Add' }} Drink
+        {{ drinkForm.id ? 'Update' : 'Add' }} Drink
       </button>
     </form>
 
     <div class="space-y-4">
       <div
-        v-for="drink in drinks"
+        v-for="drink in store.drinks"
         :key="drink.id"
         class="flex items-center justify-between p-4 border rounded"
       >
@@ -49,71 +49,40 @@
         </div>
       </div>
     </div>
+    <LoadingIndicator :isLoading="isLoading" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import apiClient from '@/api/axiosConfig.ts'
-import { useAppStore } from '@/stores/drinksStore.ts'
+import { onMounted, ref } from 'vue'
+import { useDrinksStore } from '@/stores/drinksStore.ts'
 import type { Drink } from '@/types/Drink.ts'
+import LoadingIndicator from '@/components/LoadingIndicator.vue'
 
-// Reactive variables
-const drinks = ref<Drink[]>([])
-const drinkForm = ref({ name: '', price: 0 })
-const editingDrinkId = ref<number | null>(null)
-const store = useAppStore()
+const drinkForm = ref<Drink>({ id: undefined, name: '', price: 0 })
+const isLoading = ref<boolean>(false)
+const store = useDrinksStore()
 
-// Handle form submission (Add or Update)
 const handleSubmit = async () => {
-  try {
-    const method = editingDrinkId.value ? 'PUT' : 'POST'
-
-    const response = await apiClient.request({
-      url: '/drinks',
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: JSON.stringify(drinkForm.value),
-    })
-
-    if (response.status === 200) {
-      await fetchDrinks()
-      resetForm()
-    }
-  } catch (error) {
-    console.error('Error saving drink:', error)
-  }
+  isLoading.value = true
+  await store.saveDrink(drinkForm.value)
+  resetForm()
+  isLoading.value = false
 }
 
-// Delete a drink
 const deleteDrink = async (drinkToDelete: Drink) => {
   if (!confirm('Are you sure you want to delete this drink?')) return
-
-  try {
-    const response = await apiClient.delete(`/drinks`, {
-      data: drinkToDelete,
-    })
-
-    if (response.status === 200) {
-      await fetchDrinks()
-    }
-  } catch (error) {
-    console.error('Error deleting drink:', error)
-  }
+  isLoading.value = true
+  await store.deleteDrink(drinkToDelete)
+  isLoading.value = false
 }
 
-// Edit a drink
 const editDrink = (drink: Drink) => {
   drinkForm.value = { ...drink }
-  editingDrinkId.value = drink.id
 }
 
-// Reset the form
 const resetForm = () => {
-  drinkForm.value = { name: '', price: 0 }
-  editingDrinkId.value = null
+  drinkForm.value = { id: undefined, name: '', price: 0 }
 }
 
 onMounted(() => {

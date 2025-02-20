@@ -3,24 +3,17 @@
     <h2 class="text-xl font-semibold text-gray-800 text-center mb-4">Total Cost</h2>
 
     <form @submit.prevent="getTotalCost" class="space-y-4">
-      <div>
-        <label for="personId" class="block text-sm font-medium text-gray-700">Person ID</label>
-        <input
-          id="personId"
-          v-model.trim="personId"
-          placeholder="Enter Person ID"
-          :class="{ 'border-red-500': showError }"
-          @input="clearError"
-          class="mt-1 p-2 w-full border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
-        />
-        <p v-if="showError" class="text-red-500 text-sm mt-1">{{ errorMessage }}</p>
-      </div>
+      <label for="person">Select person:</label>
+      <select id="person" v-model="selectedPerson">
+        <option v-for="person in personsStore.persons" :key="person.id" :value="person">
+          {{ person.name }}
+        </option>
+      </select>
 
       <button
         type="submit"
-        :disabled="isLoading || !personId"
-        class="w-full py-2 px-4 rounded-lg font-semibold text-white transition disabled:bg-gray-400
-               bg-green-500 hover:bg-green-600 focus:ring-2 focus:ring-green-400"
+        :disabled="isLoading || !selectedPerson?.id"
+        class="w-full py-2 px-4 rounded-lg font-semibold text-white transition disabled:bg-gray-400 bg-green-500 hover:bg-green-600 focus:ring-2 focus:ring-green-400"
       >
         <span v-if="isLoading">Loading...</span>
         <span v-else>Get Total</span>
@@ -41,75 +34,98 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import apiClient from "@/api/axiosConfig";
-import axios, { type AxiosError } from "axios";
-import { formatCurrency, formatDateTime } from "@/util/format.ts";
+import { ref } from 'vue'
+import apiClient from '@/api/axiosConfig'
+import { usePersonsStore } from '@/stores/personsStore.ts'
+import { formatCurrency, formatDateTime } from '@/util/format.ts'
+import type { Person } from '@/types/Person.ts'
+import axios, { type AxiosError } from 'axios'
 
-const personId = ref<number | null>(null);
-const totalCost = ref<number | null>(null);
-const errorMessage = ref<string>("");
-const showError = ref<boolean>(false);
-const isLoading = ref<boolean>(false);
-const lastUpdated = ref<Date>();
+const selectedPerson = ref<Person | null>(null)
+const totalCost = ref<number | null>(null)
+const errorMessage = ref<string>('')
+const showError = ref<boolean>(false)
+const isLoading = ref<boolean>(false)
+const lastUpdated = ref<Date>()
+const personsStore = usePersonsStore()
 
 const clearError = () => {
-  showError.value = false;
-  errorMessage.value = "";
-};
-
-const validateInput = () => {
-  if (!personId.value) {
-    showError.value = true;
-    errorMessage.value = "Please enter a valid Person ID";
-    return false;
-  }
-  return true;
-};
+  showError.value = false
+  errorMessage.value = ''
+}
 
 const getTotalCost = async () => {
-  if (!validateInput()) return;
-
-  isLoading.value = true;
-  totalCost.value = null;
-  clearError();
+  isLoading.value = true
+  totalCost.value = null
+  clearError()
 
   try {
-    const response = await apiClient.get(`/persons/${personId.value}/total`, { timeout: 5000 });
-    totalCost.value = response.data;
-    lastUpdated.value = new Date();
+    const response = await apiClient.get(`/persons/${selectedPerson.value?.id}/total`, {
+      timeout: 5000,
+    })
+    totalCost.value = response.data
+    lastUpdated.value = new Date()
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      handleError(error);
+      handleError(error)
     } else {
-      console.error('Unexpected error:', error);
+      console.error('Unexpected error:', error)
     }
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
 
 const handleError = (error: AxiosError) => {
-  showError.value = true;
-  totalCost.value = null;
+  showError.value = true
+  totalCost.value = null
 
   if (error.response) {
     switch (error.response.status) {
       case 404:
-        errorMessage.value = "Person not found";
-        break;
+        errorMessage.value = 'Person not found'
+        break
       case 400:
-        errorMessage.value = "Invalid Person ID";
-        break;
+        errorMessage.value = 'Invalid Person ID'
+        break
       default:
-        errorMessage.value = "Error fetching total cost";
+        errorMessage.value = 'Error fetching total cost'
     }
-  } else if (error.code === "ECONNABORTED") {
-    errorMessage.value = "Request timed out. Please try again.";
+  } else if (error.code === 'ECONNABORTED') {
+    errorMessage.value = 'Request timed out. Please try again.'
   } else if (error.request) {
-    errorMessage.value = "Network error. Please check your connection.";
+    errorMessage.value = 'Network error. Please check your connection.'
   } else {
-    errorMessage.value = "An unexpected error occurred.";
+    errorMessage.value = 'An unexpected error occurred.'
   }
-};
+}
 </script>
+
+<style scoped>
+label {
+  display: block;
+  margin-top: 10px;
+}
+
+select,
+input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px;
+  background: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+</style>

@@ -10,14 +10,14 @@
     <form @submit.prevent="handleSubmit" class="mb-8 p-4 border rounded">
       <input v-model="personForm.name" placeholder="name" class="border p-2 mr-2" required />
       <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-        {{ editingPersonId ? 'Update' : 'Add' }} Person
+        {{ personForm.id ? 'Update' : 'Add' }} Person
       </button>
     </form>
 
     <!-- Persons List -->
     <div class="space-y-4">
       <div
-        v-for="person in persons"
+        v-for="person in store.persons"
         :key="person.id"
         class="flex items-center justify-between p-4 border rounded"
       >
@@ -40,85 +40,43 @@
         </div>
       </div>
     </div>
-    <LoadingIndicator :isLoading="isLoading" />
+    <loading-indicator :isLoading="isLoading" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import type { Person } from '@/types/Person.ts'
-import apiClient from '@/api/axiosConfig.ts'
+import { onMounted, ref } from 'vue'
 import LoadingIndicator from '@/components/LoadingIndicator.vue'
+import { usePersonsStore } from '@/stores/personsStore.ts'
+import type { Person } from '@/types/Person.ts'
 
-const persons = ref<Person[]>([])
 const personForm = ref<Person>({ id: 0, name: '' })
-const editingPersonId = ref<number | null>(null)
 const isLoading = ref(false)
-
-const fetchPersons = async () => {
-  isLoading.value = true
-  try {
-    const response = await apiClient.get('/persons')
-    persons.value = response.data
-  } catch (error) {
-    console.error('Error fetching persons:', error)
-  } finally {
-    isLoading.value = false
-  }
-}
+const store = usePersonsStore()
 
 const handleSubmit = async () => {
   isLoading.value = true
-  try {
-    const method = editingPersonId.value ? 'PUT' : 'POST'
-
-    const response = await apiClient.request({
-      url: '/persons',
-      method: method,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: JSON.stringify(personForm.value)
-    })
-
-    if (response.status === 200) {
-      await fetchPersons()
-      resetForm()
-    }
-  } catch (error) {
-    console.error('Error saving person:', error)
-    isLoading.value = false
-  }
+  await store.savePerson(personForm.value)
+  resetForm()
+  isLoading.value = false
 }
 
 const deletePerson = async (personToDelete: Person) => {
-  isLoading.value = true
   if (!confirm('Are you sure you want to delete this person?')) return
-
-  try {
-    const response = await apiClient.delete(`/persons`, {
-      data: personToDelete
-    })
-    if (response.status === 204) {
-      await fetchPersons()
-    }
-  } catch (error) {
-    console.error('Error deleting person:', error)
-    isLoading.value = false
-  }
+  isLoading.value = true
+  await store.deletePerson(personToDelete)
+  isLoading.value = false
 }
 
 const editPerson = (person: Person) => {
   personForm.value = { ...person }
-  editingPersonId.value = person.id
 }
 
 const resetForm = () => {
-  personForm.value = { id: 0, name: '' }
-  editingPersonId.value = null
+  personForm.value = { id: undefined, name: '' }
 }
 
 onMounted(() => {
-  fetchPersons()
+  store.fetchPersons()
 })
 </script>

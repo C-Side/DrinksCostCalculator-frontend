@@ -7,14 +7,14 @@
 
     <label for="person">Select person:</label>
     <select id="person" v-model="selectedPerson">
-      <option v-for="person in persons" :key="person.id" :value="person">
+      <option v-for="person in personsStore.persons" :key="person.id" :value="person">
         {{ person.name }}
       </option>
     </select>
 
     <label for="drink">Select drink:</label>
     <select id="drink" v-model="selectedDrink">
-      <option v-for="drink in drinks" :key="drink.id" :value="drink">
+      <option v-for="drink in drinksStore.drinks" :key="drink.id" :value="drink">
         {{ drink.name }}
       </option>
     </select>
@@ -22,72 +22,66 @@
     <label for="amount">Amount:</label>
     <input id="amount" type="number" v-model="amount" min="1" />
 
-    <button @click="addDrink" :disabled="loading">
-      {{ loading ? "Saving..." : "Add Drink" }}
+    <button :disabled="isLoading" @click="addDrink">
+      {{ isLoading ? 'Saving...' : 'Add Drink' }}
     </button>
+    <loading-indicator :isLoading="isLoading" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { onMounted, ref } from 'vue'
 import apiClient from '@/api/axiosConfig.ts'
+import { usePersonsStore } from '@/stores/personsStore.ts'
+import { useDrinksStore } from '@/stores/drinksStore.ts'
 import type { Person } from '@/types/Person.ts'
 import type { Drink } from '@/types/Drink.ts'
-
+import LoadingIndicator from '@/components/LoadingIndicator.vue'
 
 interface DrinkAddedDTO {
-  drinkDTO: Drink;
-  quantity: number;
+  drinkDTO: Drink
+  quantity: number
 }
 
-const persons = ref<Person[]>([]);
-const drinks = ref<Drink[]>([]);
-const selectedPerson = ref<Person | null>(null);
-const selectedDrink = ref<Drink | null>(null);
-const amount = ref<number>(1);
-const loading = ref<boolean>(false);
-const errorMessage = ref<string | null>(null);
-const successMessage = ref<string | null>(null);
-
-const fetchData = async () => {
-  try {
-    const personsResponse = await apiClient.get<Person[]>("/persons");
-    const drinksResponse = await apiClient.get<Drink[]>("/drinks");
-    persons.value = personsResponse.data;
-    drinks.value = drinksResponse.data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    errorMessage.value = "Failed to load data from server.";
-  }
-};
+const selectedPerson = ref<Person | null>(null)
+const selectedDrink = ref<Drink | null>(null)
+const amount = ref<number>(1)
+const isLoading = ref<boolean>(false)
+const errorMessage = ref<string | null>(null)
+const successMessage = ref<string | null>(null)
+const personsStore = usePersonsStore()
+const drinksStore = useDrinksStore()
 
 const addDrink = async () => {
   if (!selectedPerson.value || !selectedDrink.value || amount.value <= 0) {
-    errorMessage.value = "Please select a person, a drink, and enter a valid amount.";
-    return;
+    errorMessage.value = 'Please select a person, a drink, and enter a valid amount.'
+    return
   }
 
-  loading.value = true;
-  errorMessage.value = null;
-  successMessage.value = null;
+  isLoading.value = true
+  errorMessage.value = null
+  successMessage.value = null
 
   try {
     const drinkAddedDTO: DrinkAddedDTO = {
       drinkDTO: selectedDrink.value,
       quantity: amount.value,
-    };
+    }
 
-    await apiClient.post(`/persons/${selectedPerson.value.id}/drinks`, drinkAddedDTO);
-    successMessage.value = "Drink successfully added!";
+    await apiClient.post(`/persons/${selectedPerson.value.id}/drinks`, drinkAddedDTO)
+    successMessage.value = 'Drink successfully added!'
   } catch (error) {
-    console.error("Error adding drink:", error);
-    errorMessage.value = "Failed to add drink. Please try again.";
+    console.error('Error adding drink:', error)
+    errorMessage.value = 'Failed to add drink. Please try again.'
   } finally {
-    loading.value = false;
+    isLoading.value = false
   }
-};
+}
 
-onMounted(fetchData);
+onMounted(() => {
+  personsStore.fetchPersons()
+  drinksStore.fetchDrinks()
+})
 </script>
 
 <style scoped>
@@ -105,7 +99,8 @@ label {
   margin-top: 10px;
 }
 
-select, input {
+select,
+input {
   width: 100%;
   padding: 8px;
   margin-top: 5px;
