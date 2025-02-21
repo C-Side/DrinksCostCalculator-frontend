@@ -23,7 +23,7 @@
     <input id="amount" type="number" v-model="amount" min="1" />
 
     <button :disabled="isLoading" @click="addDrink">
-      {{ isLoading ? 'Saving...' : 'Add Drink' }}
+      {{ isLoading ? 'Saving...' : 'Add DrinkTypes' }}
     </button>
     <loading-indicator :isLoading="isLoading" />
   </div>
@@ -36,7 +36,7 @@ import { usePersonsStore } from '@/stores/personsStore.ts'
 import { useDrinksStore } from '@/stores/drinksStore.ts'
 import type { Person } from '@/types/Person.ts'
 import type { Drink } from '@/types/Drink.ts'
-import LoadingIndicator from '@/components/LoadingIndicator.vue'
+import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
 
 interface DrinkAddedDTO {
   drinkDTO: Drink
@@ -69,7 +69,7 @@ const addDrink = async () => {
     }
 
     await apiClient.post(`/persons/${selectedPerson.value.id}/drinks`, drinkAddedDTO)
-    successMessage.value = 'Drink successfully added!'
+    successMessage.value = 'DrinkTypes successfully added!'
   } catch (error) {
     console.error('Error adding drink:', error)
     errorMessage.value = 'Failed to add drink. Please try again.'

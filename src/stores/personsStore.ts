@@ -29,7 +29,7 @@ export const usePersonsStore = defineStore('persons', () => {
         persons.value.push(response.data)
       }
     } catch (error) {
-      console.error('Error saving Person:', error)
+      console.error('Error saving PersonTypes:', error)
     }
   }
 
@@ -42,7 +42,7 @@ export const usePersonsStore = defineStore('persons', () => {
         persons.value = persons.value.filter((person) => person.id !== personToDelete.id)
       }
     } catch (error) {
-      console.error('Error deleting Person:', error)
+      console.error('Error deleting PersonTypes:', error)
     }
   }
 
