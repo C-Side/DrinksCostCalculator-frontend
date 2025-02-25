@@ -11,17 +11,15 @@ export const useDrinksStore = defineStore('drinks', () => {
 
     try {
       const response = await apiClient.get('/drinks')
-      drinks.value = response.data
+      drinks.value = response.data._embedded.drinks
     } catch (error) {
       console.error('Error fetching drinks:', error)
     }
   }
 
-  async function addDrink(drink: Drink) {
+  async function addDrink(newDrink: Drink) {
     try {
-      const response = await apiClient.post('/drinks', {
-        data: drink,
-      })
+      const response = await apiClient.post('/drinks', newDrink)
       if (response.status === 201) {
         drinks.value.push(response.data)
       }
@@ -30,13 +28,12 @@ export const useDrinksStore = defineStore('drinks', () => {
     }
   }
 
-  async function updateDrink(person: Drink) {
+  async function updateDrink(drinkToUpdate: Drink) {
     try {
-      const response = await apiClient.put('/drinks', {
-        data: person,
-      })
+      const response = await apiClient.put(`/drinks/${drinkToUpdate.id}`, drinkToUpdate)
       if (response.status === 200) {
-        drinks.value[drinks.value.findIndex((p) => p.id === person.id)] = response.data
+        drinks.value[drinks.value.findIndex((drink: Drink) => drink.id === drinkToUpdate.id)] =
+          response.data
       }
     } catch (error) {
       console.error('Error saving existing drink:', error)
@@ -45,10 +42,8 @@ export const useDrinksStore = defineStore('drinks', () => {
 
   async function deleteDrink(drinkToDelete: Drink) {
     try {
-      const response = await apiClient.delete(`/drinks`, {
-        data: drinkToDelete,
-      })
-      if (response.status === 204) {
+      const response = await apiClient.delete(`/drinks/${drinkToDelete.id}`)
+      if (response.status === 200) {
         drinks.value = drinks.value.filter((drink) => drink.id !== drinkToDelete.id)
       }
     } catch (error) {
