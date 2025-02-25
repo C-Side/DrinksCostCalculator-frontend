@@ -25,7 +25,7 @@ export const usePersonsStore = defineStore('persons', () => {
         method,
         data: person,
       })
-      if (response.status === 200) {
+      if (response.status === 201) {
         persons.value.push(response.data)
       }
     } catch (error) {

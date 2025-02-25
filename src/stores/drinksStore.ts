@@ -25,7 +25,7 @@ export const useDrinksStore = defineStore('drinks', () => {
         method,
         data: drink,
       })
-      if (response.status === 200) {
+      if (response.status === 201) {
         drinks.value.push(response.data)
       }
     } catch (error) {
