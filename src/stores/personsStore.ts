@@ -21,7 +21,7 @@ export const usePersonsStore = defineStore('persons', () => {
     try {
       const method = person.id ? 'PUT' : 'POST'
       const response = await apiClient.request({
-        url: '/Persons',
+        url: '/persons',
         method,
         data: person,
       })
