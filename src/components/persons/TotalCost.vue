@@ -38,10 +38,10 @@ import { ref } from 'vue'
 import apiClient from '@/api/axiosConfig.ts'
 import { usePersonsStore } from '@/stores/personsStore.ts'
 import { formatCurrency, formatDateTime } from '@/util/format.ts'
-import type { Person } from '@/types/Person.ts'
+import type { Drink } from '@/types/Person.ts'
 import axios, { type AxiosError } from 'axios'
 
-const selectedPerson = ref<Person | null>(null)
+const selectedPerson = ref<Drink | null>(null)
 const totalCost = ref<number | null>(null)
 const errorMessage = ref<string>('')
 const showError = ref<boolean>(false)

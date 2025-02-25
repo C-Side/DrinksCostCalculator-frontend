@@ -23,14 +23,14 @@
     <input id="amount" type="number" v-model="amount" min="1" />
 
     <button :disabled="isLoading" @click="addDrink">
-      {{ isLoading ? 'Saving...' : 'Add DrinkTypes' }}
+      {{ isLoading ? 'Saving...' : 'Add drink' }}
     </button>
     <loading-indicator :isLoading="isLoading" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import apiClient from '@/api/axiosConfig.ts'
 import { usePersonsStore } from '@/stores/personsStore.ts'
 import { useDrinksStore } from '@/stores/drinksStore.ts'
@@ -77,11 +77,6 @@ const addDrink = async () => {
     isLoading.value = false
   }
 }
-
-onMounted(() => {
-  personsStore.fetchPersons()
-  drinksStore.fetchDrinks()
-})
 </script>
 
 <style scoped>

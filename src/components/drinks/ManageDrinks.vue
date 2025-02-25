@@ -11,6 +11,16 @@
         step="0.01"
         type="number"
       />
+      <label for="drinkCategory">Select category:</label>
+      <select id="drinkCategory" v-model="selectedCategory" class="border p-2 mr-2">
+        <option
+          v-for="drinkCategory in drinkCategoriesStore.drinkCategories"
+          :key="drinkCategory.id"
+          :value="drinkCategory"
+        >
+          {{ drinkCategory.category }}
+        </option>
+      </select>
       <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" type="submit">
         {{ drinkForm.id ? 'Update' : 'Add' }} Drink
       </button>
@@ -18,7 +28,7 @@
 
     <div class="space-y-4">
       <div
-        v-for="drink in store.drinks"
+        v-for="drink in drinksStore.drinks"
         :key="drink.id"
         class="flex items-center justify-between p-4 border rounded"
       >
@@ -48,23 +58,31 @@
 
 <script lang="ts" setup>
 import { formatCurrency } from '@/util/format.ts'
-import { ref } from 'vue'
-import type { Drink } from '@/types/Drink.ts'
-import { useDrinksStore } from '@/stores/drinksStore.ts'
+import { onMounted, ref } from 'vue'
 import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
+import type { Drink, DrinkCategory } from '@/types/Drink.ts'
+import { useDrinksStore } from '@/stores/drinksStore.ts'
+import { useDrinkCategoriesStore } from '@/stores/drinkCategoriesStore.ts'
 
 const drinkForm = ref<Drink>({
   id: undefined,
   name: '',
   price: 0,
-  drinkKind: { kind: '', isAlcoholic: false },
+  drinkCategory: { id: 0, category: '', alcoholic: false },
 })
 const isLoading = ref<boolean>(false)
-const store = useDrinksStore()
+const drinksStore = useDrinksStore()
+const drinkCategoriesStore = useDrinkCategoriesStore()
+const selectedCategory = ref<DrinkCategory>(drinkCategoriesStore.drinkCategories[0])
 
 const handleSubmit = async () => {
   isLoading.value = true
-  await store.saveDrink(drinkForm.value)
+  drinkForm.value.drinkCategory = selectedCategory.value
+  if (drinkForm.value.id) {
+    await drinksStore.updateDrink(drinkForm.value)
+  } else {
+    await drinksStore.addDrink(drinkForm.value)
+  }
   resetForm()
   isLoading.value = false
 }
@@ -72,7 +90,7 @@ const handleSubmit = async () => {
 const deleteDrink = async (drinkToDelete: Drink) => {
   if (!confirm('Are you sure you want to delete this drink?')) return
   isLoading.value = true
-  await store.deleteDrink(drinkToDelete)
+  await drinksStore.deleteDrink(drinkToDelete)
   isLoading.value = false
 }
 
@@ -85,7 +103,11 @@ const resetForm = () => {
     id: undefined,
     name: '',
     price: 0,
-    drinkKind: { kind: '', isAlcoholic: false },
+    drinkCategory: { category: '', alcoholic: false },
   }
 }
+
+onMounted(() => {
+  selectedCategory.value = drinkCategoriesStore.drinkCategories[0]
+})
 </script>

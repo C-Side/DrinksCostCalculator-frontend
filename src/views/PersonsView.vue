@@ -48,27 +48,31 @@
 import { onMounted, ref } from 'vue'
 import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
 import { usePersonsStore } from '@/stores/personsStore.ts'
-import type { Person } from '@/types/Person.ts'
+import type { Drink } from '@/types/Person.ts'
 
-const personForm = ref<Person>({ id: undefined, name: '', age: 0, role: '' })
+const personForm = ref<Drink>({ id: undefined, name: '', age: 0, role: '' })
 const isLoading = ref(false)
 const store = usePersonsStore()
 
 const handleSubmit = async () => {
   isLoading.value = true
-  await store.savePerson(personForm.value)
+  if (personForm.value.id) {
+    await store.updatePerson(personForm.value)
+  } else {
+    await store.addPerson(personForm.value)
+  }
   resetForm()
   isLoading.value = false
 }
 
-const deletePerson = async (personToDelete: Person) => {
+const deletePerson = async (personToDelete: Drink) => {
   if (!confirm('Are you sure you want to delete this person?')) return
   isLoading.value = true
   await store.deletePerson(personToDelete)
   isLoading.value = false
 }
 
-const editPerson = (person: Person) => {
+const editPerson = (person: Drink) => {
   personForm.value = { ...person }
 }
 

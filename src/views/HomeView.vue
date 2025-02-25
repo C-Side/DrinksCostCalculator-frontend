@@ -11,4 +11,15 @@
 <script setup lang="ts">
 import TotalCost from '@/components/persons/TotalCost.vue'
 import AddConsumption from '@/components/persons/AddConsumption.vue'
+import { onMounted } from 'vue'
+import { usePersonsStore } from '@/stores/personsStore.ts'
+import { useDrinksStore } from '@/stores/drinksStore.ts'
+
+const personsStore = usePersonsStore()
+const drinksStore = useDrinksStore()
+
+onMounted(() => {
+  personsStore.fetchPersons()
+  drinksStore.fetchDrinks()
+})
 </script>

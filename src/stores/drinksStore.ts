@@ -17,19 +17,29 @@ export const useDrinksStore = defineStore('drinks', () => {
     }
   }
 
-  async function saveDrink(drink: Drink) {
+  async function addDrink(drink: Drink) {
     try {
-      const method = drink.id ? 'PUT' : 'POST'
-      const response = await apiClient.request({
-        url: '/drinks',
-        method,
+      const response = await apiClient.post('/drinks', {
         data: drink,
       })
       if (response.status === 201) {
         drinks.value.push(response.data)
       }
     } catch (error) {
-      console.error('Error saving drink:', error)
+      console.error('Error adding new drink:', error)
+    }
+  }
+
+  async function updateDrink(person: Drink) {
+    try {
+      const response = await apiClient.put('/drinks', {
+        data: person,
+      })
+      if (response.status === 200) {
+        drinks.value[drinks.value.findIndex((p) => p.id === person.id)] = response.data
+      }
+    } catch (error) {
+      console.error('Error saving existing drink:', error)
     }
   }
 
@@ -49,7 +59,8 @@ export const useDrinksStore = defineStore('drinks', () => {
   return {
     drinks,
     fetchDrinks,
-    saveDrink,
+    addDrink,
+    updateDrink,
     deleteDrink,
   }
 })

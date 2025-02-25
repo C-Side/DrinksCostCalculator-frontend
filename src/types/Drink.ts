@@ -2,11 +2,11 @@ export interface Drink {
   id?: number
   name: string
   price: number
-  drinkKind: DrinkKind
+  drinkCategory: DrinkCategory
 }
 
-export interface DrinkKind {
+export interface DrinkCategory {
   id?: number
-  kind: string
-  isAlcoholic: boolean
+  category: string
+  alcoholic: boolean
 }
