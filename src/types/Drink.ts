@@ -9,4 +9,9 @@ export interface DrinkCategory {
   id?: number
   category: string
   alcoholic: boolean
+  _links: {
+    self: {
+      href: string
+    }
+  }
 }

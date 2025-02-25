@@ -19,7 +19,12 @@ export const useDrinksStore = defineStore('drinks', () => {
 
   async function addDrink(newDrink: Drink) {
     try {
-      const response = await apiClient.post('/drinks', newDrink)
+      const drinkToCreate = {
+        name: newDrink.name,
+        price: newDrink.price,
+        drinkCategory: new URL(newDrink.drinkCategory._links.self.href).pathname,
+      }
+      const response = await apiClient.post('/drinks', drinkToCreate)
       if (response.status === 201) {
         drinks.value.push(response.data)
       }
