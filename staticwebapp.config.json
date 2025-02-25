@@ -3,7 +3,8 @@
     {
       "route": "/*",
       "allowedRoles": [
-        "authenticated"
+        "authenticated",
+        "administrator"
       ]
     }
   ],
