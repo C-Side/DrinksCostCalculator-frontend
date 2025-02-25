@@ -8,9 +8,9 @@
     </div>
 
     <form @submit.prevent="handleSubmit" class="mb-8 p-4 border rounded">
-      <input v-model="personForm.name" placeholder="name" class="border p-2 mr-2" required />
+      <input v-model="personForm.name" class="border p-2 mr-2" placeholder="Person name" required />
       <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-        {{ personForm.id ? 'Update' : 'Add' }} Person
+        {{ personForm.id ? 'Update' : 'Add' }} person
       </button>
     </form>
 
@@ -46,11 +46,11 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import LoadingIndicator from '@/components/LoadingIndicator.vue'
+import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
 import { usePersonsStore } from '@/stores/personsStore.ts'
 import type { Person } from '@/types/Person.ts'
 
-const personForm = ref<Person>({ id: 0, name: '' })
+const personForm = ref<Person>({ id: undefined, name: '', age: 0, role: '' })
 const isLoading = ref(false)
 const store = usePersonsStore()
 
@@ -73,7 +73,7 @@ const editPerson = (person: Person) => {
 }
 
 const resetForm = () => {
-  personForm.value = { id: undefined, name: '' }
+  personForm.value = { id: undefined, name: '', age: 0, role: '' }
 }
 
 onMounted(() => {

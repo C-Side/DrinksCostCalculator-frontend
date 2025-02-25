@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import apiClient from '@/api/axiosConfig'
+import apiClient from '@/api/axiosConfig.ts'
 import { usePersonsStore } from '@/stores/personsStore.ts'
 import { formatCurrency, formatDateTime } from '@/util/format.ts'
 import type { Person } from '@/types/Person.ts'
@@ -83,10 +83,10 @@ const handleError = (error: AxiosError) => {
   if (error.response) {
     switch (error.response.status) {
       case 404:
-        errorMessage.value = 'Person not found'
+        errorMessage.value = 'PersonTypes not found'
         break
       case 400:
-        errorMessage.value = 'Invalid Person ID'
+        errorMessage.value = 'Invalid PersonTypes ID'
         break
       default:
         errorMessage.value = 'Error fetching total cost'
