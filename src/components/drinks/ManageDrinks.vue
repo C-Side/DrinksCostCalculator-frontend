@@ -22,7 +22,7 @@
         </option>
       </select>
       <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" type="submit">
-        {{ drinkForm.id ? 'Update' : 'Add' }} Drink
+        {{ drinkForm.id ? 'Update' : 'Add' }} drink
       </button>
     </form>
 
