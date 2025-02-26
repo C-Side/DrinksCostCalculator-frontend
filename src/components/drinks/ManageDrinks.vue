@@ -68,7 +68,16 @@ const drinkForm = ref<Drink>({
   id: undefined,
   name: '',
   price: 0,
-  drinkCategory: { id: 0, category: '', alcoholic: false },
+  drinkCategory: {
+    id: undefined,
+    category: '',
+    alcoholic: false,
+    _links: {
+      self: {
+        href: '',
+      },
+    },
+  },
 })
 const isLoading = ref<boolean>(false)
 const drinksStore = useDrinksStore()
@@ -103,7 +112,16 @@ const resetForm = () => {
     id: undefined,
     name: '',
     price: 0,
-    drinkCategory: { category: '', alcoholic: false },
+    drinkCategory: {
+      id: undefined,
+      category: '',
+      alcoholic: false,
+      _links: {
+        self: {
+          href: '',
+       },
+     },
+    },
   }
 }
 

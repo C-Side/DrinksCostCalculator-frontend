@@ -58,7 +58,16 @@ import { useDrinkCategoriesStore } from '@/stores/drinkCategoriesStore'
 import type { DrinkCategory } from '@/types/Drink.ts'
 import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
 
-const drinkCategoryForm = ref<DrinkCategory>({ id: undefined, category: '', alcoholic: false })
+const drinkCategoryForm = ref<DrinkCategory>({
+  id: undefined,
+  category: '',
+  alcoholic: false,
+  _links: {
+    self: {
+      href: '',
+    },
+  },
+})
 const isLoading = ref<boolean>(false)
 const drinkCategoriesStore = useDrinkCategoriesStore()
 
@@ -87,6 +96,11 @@ const resetForm = () => {
     id: undefined,
     category: '',
     alcoholic: false,
+    _links: {
+      self: {
+        href: '',
+      },
+    },
   }
 }
 </script>

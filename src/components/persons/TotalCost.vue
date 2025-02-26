@@ -38,7 +38,7 @@ import { ref } from 'vue'
 import apiClient from '@/api/axiosConfig.ts'
 import { usePersonsStore } from '@/stores/personsStore.ts'
 import { formatCurrency, formatDateTime } from '@/util/format.ts'
-import type { Drink } from '@/types/Person.ts'
+import type { Drink } from '@/types/Drink.ts'
 import axios, { type AxiosError } from 'axios'
 
 const selectedPerson = ref<Drink | null>(null)
