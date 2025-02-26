@@ -11,7 +11,7 @@ export const useDrinkCategoriesStore = defineStore('drinkCategories', () => {
 
     try {
       const response = await apiClient.get('/drink-categories')
-      drinkCategories.value = response.data._embedded.drinkCategories
+      drinkCategories.value = response.data._embedded.drinkCategories.map(mapResponseToModel)
     } catch (error) {
       console.error('Error fetching drink categories:', error)
     }
@@ -66,4 +66,24 @@ export const useDrinkCategoriesStore = defineStore('drinkCategories', () => {
     updateDrinkCategory,
     deleteDrinkCategory,
   }
+
+  function mapResponseToModel(drinkCategoryToMap: DrinkCategoryResponse): DrinkCategory {
+    return {
+      id: drinkCategoryToMap.id,
+      category: drinkCategoryToMap.category,
+      alcoholic: drinkCategoryToMap.alcoholic,
+      resourceUrl: new URL(drinkCategoryToMap._links.self.href).pathname,
+    }
+  }
 })
+
+interface DrinkCategoryResponse {
+  id?: number
+  category: string
+  alcoholic: boolean
+  _links: {
+    self: {
+      href: string
+    }
+  }
+}

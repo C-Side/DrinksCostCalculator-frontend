@@ -13,7 +13,6 @@
         id="isAlcoholic"
         v-model="drinkCategoryForm.alcoholic"
         class="border p-2 mr-2"
-        required
         type="checkbox"
       />
       <label for="isAlcoholic"> Is Alcoholic </label>
@@ -59,14 +58,8 @@ import type { DrinkCategory } from '@/types/Drink.ts'
 import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
 
 const drinkCategoryForm = ref<DrinkCategory>({
-  id: undefined,
   category: '',
   alcoholic: false,
-  _links: {
-    self: {
-      href: '',
-    },
-  },
 })
 const isLoading = ref<boolean>(false)
 const drinkCategoriesStore = useDrinkCategoriesStore()
@@ -93,14 +86,8 @@ const deleteDrinkCategory = async (drinkCategory: DrinkCategory) => {
 
 const resetForm = () => {
   drinkCategoryForm.value = {
-    id: undefined,
     category: '',
     alcoholic: false,
-    _links: {
-      self: {
-        href: '',
-      },
-    },
   }
 }
 </script>

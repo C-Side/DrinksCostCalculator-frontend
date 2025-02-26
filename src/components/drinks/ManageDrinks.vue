@@ -12,7 +12,7 @@
         type="number"
       />
       <label for="drinkCategory">Select category:</label>
-      <select id="drinkCategory" v-model="selectedCategory" class="border p-2 mr-2">
+      <select id="drinkCategory" v-model="selectedCategory" class="border p-2 mr-2" required>
         <option
           v-for="drinkCategory in drinkCategoriesStore.drinkCategories"
           :key="drinkCategory.id"
@@ -65,18 +65,11 @@ import { useDrinksStore } from '@/stores/drinksStore.ts'
 import { useDrinkCategoriesStore } from '@/stores/drinkCategoriesStore.ts'
 
 const drinkForm = ref<Drink>({
-  id: undefined,
   name: '',
   price: 0,
   drinkCategory: {
-    id: undefined,
     category: '',
     alcoholic: false,
-    _links: {
-      self: {
-        href: '',
-      },
-    },
   },
 })
 const isLoading = ref<boolean>(false)
@@ -109,18 +102,11 @@ const editDrink = (drink: Drink) => {
 
 const resetForm = () => {
   drinkForm.value = {
-    id: undefined,
     name: '',
     price: 0,
     drinkCategory: {
-      id: undefined,
       category: '',
       alcoholic: false,
-      _links: {
-        self: {
-          href: '',
-       },
-     },
     },
   }
 }

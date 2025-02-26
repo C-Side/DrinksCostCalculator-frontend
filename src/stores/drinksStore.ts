@@ -22,7 +22,7 @@ export const useDrinksStore = defineStore('drinks', () => {
       const drinkToCreate = {
         name: newDrink.name,
         price: newDrink.price,
-        drinkCategory: new URL(newDrink.drinkCategory._links.self.href).pathname,
+        drinkCategory: newDrink.drinkCategory.resourceUrl,
       }
       const response = await apiClient.post('/drinks', drinkToCreate)
       if (response.status === 201) {
