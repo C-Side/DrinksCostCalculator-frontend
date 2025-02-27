@@ -11,7 +11,7 @@ export const useDrinksStore = defineStore('drinks', () => {
 
     try {
       const response = await apiClient.get('/drinks')
-      drinks.value = response.data._embedded.drinks
+      drinks.value = response.data._embedded.drinks.map(mapResponseToModel)
     } catch (error) {
       console.error('Error fetching drinks:', error)
     }
@@ -22,7 +22,7 @@ export const useDrinksStore = defineStore('drinks', () => {
       const drinkToCreate = {
         name: newDrink.name,
         price: newDrink.price,
-        drinkCategory: newDrink.drinkCategory.resourceUrl,
+        drinkCategory: newDrink.drinkCategory,
       }
       const response = await apiClient.post('/drinks', drinkToCreate)
       if (response.status === 201) {
@@ -56,6 +56,16 @@ export const useDrinksStore = defineStore('drinks', () => {
     }
   }
 
+  function mapResponseToModel(drinkToMap: DrinkResponse): Drink {
+    return {
+      id: drinkToMap.id,
+      name: drinkToMap.name,
+      price: drinkToMap.price,
+      drinkCategory: new URL(drinkToMap._links.drinkCategory.href).pathname,
+      resourceUrl: new URL(drinkToMap._links.self.href).pathname,
+    }
+  }
+
   return {
     drinks,
     fetchDrinks,
@@ -64,3 +74,17 @@ export const useDrinksStore = defineStore('drinks', () => {
     deleteDrink,
   }
 })
+
+interface DrinkResponse {
+  id?: number
+  name: string
+  price: number
+  _links: {
+    self: {
+      href: string
+    }
+    drinkCategory: {
+      href: string
+    }
+  }
+}

@@ -39,7 +39,8 @@ import type { Drink } from '@/types/Drink.ts'
 import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
 
 interface DrinkAddedDTO {
-  drinkDTO: Drink
+  person: string
+  drink: string
   quantity: number
 }
 
@@ -64,11 +65,12 @@ const addDrink = async () => {
 
   try {
     const drinkAddedDTO: DrinkAddedDTO = {
-      drinkDTO: selectedDrink.value,
+      person: selectedPerson.value.resourceUrl!,
+      drink: selectedDrink.value.resourceUrl!,
       quantity: amount.value,
     }
 
-    await apiClient.post(`/persons/${selectedPerson.value.id}/drinks`, drinkAddedDTO)
+    await apiClient.post('/person-drinks', drinkAddedDTO)
     successMessage.value = 'DrinkTypes successfully added!'
   } catch (error) {
     console.error('Error adding drink:', error)

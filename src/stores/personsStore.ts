@@ -11,7 +11,7 @@ export const usePersonsStore = defineStore('persons', () => {
 
     try {
       const response = await apiClient.get('/persons')
-      persons.value = response.data._embedded.persons
+      persons.value = response.data._embedded.persons.map(mapResponseToModel)
     } catch (error) {
       console.error('Error fetching persons:', error)
     }
@@ -52,6 +52,17 @@ export const usePersonsStore = defineStore('persons', () => {
     }
   }
 
+  function mapResponseToModel(personToMap: PersonResponse): Person {
+    return {
+      id: personToMap.id,
+      name: personToMap.name,
+      age: personToMap.age,
+      role: personToMap.role,
+      resourceUrl: new URL(personToMap._links.self.href).pathname,
+      drinksConsumedByPerson: new URL(personToMap._links.drinksConsumedByPerson.href).pathname,
+    }
+  }
+
   return {
     persons,
     fetchPersons,
@@ -60,3 +71,18 @@ export const usePersonsStore = defineStore('persons', () => {
     deletePerson,
   }
 })
+
+interface PersonResponse {
+  id?: number
+  name: string
+  age: number
+  role: string
+  _links: {
+    self: {
+      href: string
+    }
+    drinksConsumedByPerson: {
+      href: string
+    }
+  }
+}

@@ -3,4 +3,6 @@ export interface Person {
   name: string
   age: number
   role: string
+  resourceUrl?: string
+  drinksConsumedByPerson: string
 }

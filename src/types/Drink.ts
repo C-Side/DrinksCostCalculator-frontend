@@ -2,7 +2,8 @@ export interface Drink {
   id?: number
   name: string
   price: number
-  drinkCategory: DrinkCategory
+  resourceUrl?: string
+  drinkCategory: string
 }
 
 export interface DrinkCategory {

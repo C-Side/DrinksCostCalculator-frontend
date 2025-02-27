@@ -59,14 +59,6 @@ export const useDrinkCategoriesStore = defineStore('drinkCategories', () => {
     }
   }
 
-  return {
-    drinkCategories,
-    fetchDrinkCategories,
-    addDrinkCategory,
-    updateDrinkCategory,
-    deleteDrinkCategory,
-  }
-
   function mapResponseToModel(drinkCategoryToMap: DrinkCategoryResponse): DrinkCategory {
     return {
       id: drinkCategoryToMap.id,
@@ -74,6 +66,14 @@ export const useDrinkCategoriesStore = defineStore('drinkCategories', () => {
       alcoholic: drinkCategoryToMap.alcoholic,
       resourceUrl: new URL(drinkCategoryToMap._links.self.href).pathname,
     }
+  }
+
+  return {
+    drinkCategories,
+    fetchDrinkCategories,
+    addDrinkCategory,
+    updateDrinkCategory,
+    deleteDrinkCategor,
   }
 })
 
