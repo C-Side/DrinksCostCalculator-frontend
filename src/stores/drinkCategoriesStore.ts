@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { DrinkCategory } from '@/types/Drink.ts'
 import apiClient from '@/api/axiosConfig.ts'
+import { extractIdFromResourceUrl } from '@/util/extract.ts'
 
 export const useDrinkCategoriesStore = defineStore('drinkCategories', () => {
   const drinkCategories = ref<DrinkCategory[]>([])
@@ -59,6 +60,13 @@ export const useDrinkCategoriesStore = defineStore('drinkCategories', () => {
     }
   }
 
+  function getDrinkCategoryByResourceUrl(resourceUrl: string): DrinkCategory {
+    const drinkCategoryId = extractIdFromResourceUrl(resourceUrl)
+    return drinkCategories.value.find(
+      (drinkCategory: DrinkCategory) => drinkCategory.id === drinkCategoryId,
+    )!
+  }
+
   function mapResponseToModel(drinkCategoryToMap: DrinkCategoryResponse): DrinkCategory {
     return {
       id: drinkCategoryToMap.id,
@@ -73,7 +81,8 @@ export const useDrinkCategoriesStore = defineStore('drinkCategories', () => {
     fetchDrinkCategories,
     addDrinkCategory,
     updateDrinkCategory,
-    deleteDrinkCategor,
+    deleteDrinkCategory,
+    getDrinkCategoryByResourceUrl,
   }
 })
 

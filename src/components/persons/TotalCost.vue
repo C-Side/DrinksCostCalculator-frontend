@@ -41,13 +41,13 @@ import { formatCurrency, formatDateTime } from '@/util/format.ts'
 import type { Drink } from '@/types/Drink.ts'
 import axios, { type AxiosError } from 'axios'
 
+const personsStore = usePersonsStore()
 const selectedPerson = ref<Drink | null>(null)
 const totalCost = ref<number | null>(null)
 const errorMessage = ref<string>('')
 const showError = ref<boolean>(false)
 const isLoading = ref<boolean>(false)
 const lastUpdated = ref<Date>()
-const personsStore = usePersonsStore()
 
 const clearError = () => {
   showError.value = false

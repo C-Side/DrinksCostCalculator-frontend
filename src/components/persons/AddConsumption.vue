@@ -44,14 +44,14 @@ interface DrinkAddedDTO {
   quantity: number
 }
 
+const personsStore = usePersonsStore()
+const drinksStore = useDrinksStore()
 const selectedPerson = ref<Person | null>(null)
 const selectedDrink = ref<Drink | null>(null)
 const amount = ref<number>(1)
 const isLoading = ref<boolean>(false)
 const errorMessage = ref<string | null>(null)
 const successMessage = ref<string | null>(null)
-const personsStore = usePersonsStore()
-const drinksStore = useDrinksStore()
 
 const addDrink = async () => {
   if (!selectedPerson.value || !selectedDrink.value || amount.value <= 0) {

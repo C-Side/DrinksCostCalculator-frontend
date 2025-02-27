@@ -61,8 +61,9 @@ const drinkCategoryForm = ref<DrinkCategory>({
   category: '',
   alcoholic: false,
 })
-const isLoading = ref<boolean>(false)
+
 const drinkCategoriesStore = useDrinkCategoriesStore()
+const isLoading = ref<boolean>(false)
 
 const handleSubmit = async () => {
   isLoading.value = true

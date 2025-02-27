@@ -5,6 +5,15 @@ import type { Drink } from '@/types/Drink.ts'
 
 export const useDrinksStore = defineStore('drinks', () => {
   const drinks = ref<Drink[]>([])
+  const emptyDrink = {
+    name: '',
+    price: 0,
+    drinkCategoryResourceUrl: '',
+    drinkCategory: {
+      category: '',
+      alcoholic: false,
+    },
+  }
 
   async function fetchDrinks() {
     if (drinks.value.length > 0) return
@@ -61,13 +70,18 @@ export const useDrinksStore = defineStore('drinks', () => {
       id: drinkToMap.id,
       name: drinkToMap.name,
       price: drinkToMap.price,
-      drinkCategory: new URL(drinkToMap._links.drinkCategory.href).pathname,
+      drinkCategoryResourceUrl: new URL(drinkToMap._links.drinkCategory.href).pathname,
+      drinkCategory: {
+        category: '',
+        alcoholic: fale,
+      },
       resourceUrl: new URL(drinkToMap._links.self.href).pathname,
     }
   }
 
   return {
     drinks,
+    emptyDrink,
     fetchDrinks,
     addDrink,
     updateDrink,

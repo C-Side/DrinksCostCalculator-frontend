@@ -64,22 +64,17 @@ import type { Drink, DrinkCategory } from '@/types/Drink.ts'
 import { useDrinksStore } from '@/stores/drinksStore.ts'
 import { useDrinkCategoriesStore } from '@/stores/drinkCategoriesStore.ts'
 
-const drinkForm = ref<Drink>({
-  name: '',
-  price: 0,
-  drinkCategory: {
-    category: '',
-    alcoholic: false,
-  },
-})
-const isLoading = ref<boolean>(false)
 const drinksStore = useDrinksStore()
 const drinkCategoriesStore = useDrinkCategoriesStore()
+const drinkForm = ref<Drink>(drinksStore.emptyDrink)
+const isLoading = ref<boolean>(false)
 const selectedCategory = ref<DrinkCategory>(drinkCategoriesStore.drinkCategories[0])
 
 const handleSubmit = async () => {
   isLoading.value = true
-  drinkForm.value.drinkCategory = selectedCategory.value
+  drinkForm.value.drinkCategory = drinkForm.value.drinkCategory
+    ? drinkCategoriesStore.getDrinkCategoryByResourceUrl(drinkForm.value.drinkCategoryResourceUrl)
+    : drinkForm.value.drinkCategory
   if (drinkForm.value.id) {
     await drinksStore.updateDrink(drinkForm.value)
   } else {
@@ -98,17 +93,11 @@ const deleteDrink = async (drinkToDelete: Drink) => {
 
 const editDrink = (drink: Drink) => {
   drinkForm.value = { ...drink }
+  selectedCategory.value = drink.drinkCategory!
 }
 
 const resetForm = () => {
-  drinkForm.value = {
-    name: '',
-    price: 0,
-    drinkCategory: {
-      category: '',
-      alcoholic: false,
-    },
-  }
+  drinkForm.value = drinksStore.emptyDrink
 }
 
 onMounted(() => {

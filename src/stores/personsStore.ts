@@ -5,6 +5,13 @@ import type { Person } from '@/types/Person.ts'
 
 export const usePersonsStore = defineStore('persons', () => {
   const persons = ref<Person[]>([])
+  const emptyPerson = {
+    id: undefined,
+    name: '',
+    age: 0,
+    role: '',
+    drinksConsumedByPersonResourceUrl: '',
+  }
 
   async function fetchPersons() {
     if (persons.value.length > 0) return
@@ -59,12 +66,15 @@ export const usePersonsStore = defineStore('persons', () => {
       age: personToMap.age,
       role: personToMap.role,
       resourceUrl: new URL(personToMap._links.self.href).pathname,
-      drinksConsumedByPerson: new URL(personToMap._links.drinksConsumedByPerson.href).pathname,
+      drinksConsumedByPersonResourceUrl: new URL(personToMap._links.drinksConsumedByPerson.href)
+        .pathname,
+      drinksConsumedByPerson: [,
     }
   }
 
   return {
     persons,
+    emptyPerson,
     fetchPersons,
     addPerson,
     updatePerson,

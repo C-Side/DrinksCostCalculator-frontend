@@ -50,9 +50,9 @@ import LoadingIndicator from '@/components/common/LoadingIndicator.vue'
 import { usePersonsStore } from '@/stores/personsStore.ts'
 import type { Person } from '@/types/Person.ts'
 
-const personForm = ref<Person>({ id: undefined, name: '', age: 0, role: '' })
-const isLoading = ref(false)
 const store = usePersonsStore()
+const isLoading = ref(false)
+const personForm = ref<Person>(store.emptyPerson)
 
 const handleSubmit = async () => {
   isLoading.value = true
@@ -77,7 +77,7 @@ const editPerson = (person: Person) => {
 }
 
 const resetForm = () => {
-  personForm.value = { id: undefined, name: '', age: 0, role: '' }
+  personForm.value = store.emptyPerson
 }
 
 onMounted(() => {
