@@ -72,9 +72,7 @@ const selectedCategory = ref<DrinkCategory>(drinkCategoriesStore.drinkCategories
 
 const handleSubmit = async () => {
   isLoading.value = true
-  drinkForm.value.drinkCategory = drinkForm.value.drinkCategory
-    ? drinkCategoriesStore.getDrinkCategoryByResourceUrl(drinkForm.value.drinkCategoryResourceUrl)
-    : drinkForm.value.drinkCategory
+  drinkForm.value.drinkCategory = selectedCategory.value
   if (drinkForm.value.id) {
     await drinksStore.updateDrink(drinkForm.value)
   } else {

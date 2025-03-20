@@ -68,7 +68,7 @@ export const usePersonsStore = defineStore('persons', () => {
       resourceUrl: new URL(personToMap._links.self.href).pathname,
       drinksConsumedByPersonResourceUrl: new URL(personToMap._links.drinksConsumedByPerson.href)
         .pathname,
-      drinksConsumedByPerson: [,
+      drinksConsumedByPerson: [],
     }
   }
 

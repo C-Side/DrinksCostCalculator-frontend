@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import apiClient from '@/api/axiosConfig.ts'
+import { HalApiCaller } from '@dxc-technology/halstack-client'
 import type { Drink } from '@/types/Drink.ts'
 
 export const useDrinksStore = defineStore('drinks', () => {
@@ -19,8 +20,11 @@ export const useDrinksStore = defineStore('drinks', () => {
     if (drinks.value.length > 0) return
 
     try {
-      const response = await apiClient.get('/drinks')
+      const halResponse = await HalApiCaller.get('http://localhost:8080/api/drinks').halResource
+        .getItems
+      const response = await apiClient.get('/drinks?projection=withCategory')
       drinks.value = response.data._embedded.drinks.map(mapResponseToModel)
+      drinks.value = halResponse
     } catch (error) {
       console.error('Error fetching drinks:', error)
     }
@@ -31,7 +35,7 @@ export const useDrinksStore = defineStore('drinks', () => {
       const drinkToCreate = {
         name: newDrink.name,
         price: newDrink.price,
-        drinkCategory: newDrink.drinkCategory,
+        drinkCategory: newDrink.drinkCategoryResourceUrl,
       }
       const response = await apiClient.post('/drinks', drinkToCreate)
       if (response.status === 201) {
@@ -71,10 +75,7 @@ export const useDrinksStore = defineStore('drinks', () => {
       name: drinkToMap.name,
       price: drinkToMap.price,
       drinkCategoryResourceUrl: new URL(drinkToMap._links.drinkCategory.href).pathname,
-      drinkCategory: {
-        category: '',
-        alcoholic: fale,
-      },
+      drinkCategory: undefined,
       resourceUrl: new URL(drinkToMap._links.self.href).pathname,
     }
   }
